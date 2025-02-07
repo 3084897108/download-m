@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单下载页面</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+            max-width: 90%;
+            width: 400px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, #23a6d5, #23d5ab);
+            border-radius: 2px;
+        }
+
+        .download-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #000, #004444);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+            background: linear-gradient(45deg, #004444, #008888);
+        }
+
+        .download-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .download-btn i {
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .download-btn:hover i {
+            transform: translateY(3px);
+        }
+
+        .download-btn.github {
+            background: linear-gradient(45deg, #24292e, #404448);
+        }
+
+        .download-btn.cdn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        .version {
+            margin-top: 1.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .version i {
+            color: #23a6d5;
+        }
+
+        .links-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(35, 166, 213, 0.2);
+        }
+
+        .links-title {
+            font-size: 1rem;
+            color: #2c3e50;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .links-title i {
+            color: #23a6d5;
+            font-size: 1.1rem;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .links-grid-full {
+            grid-column: 1 / -1;
+        }
+
+        .site-link {
+            padding: 12px 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid rgba(35, 166, 213, 0.2);
+            border-radius: 12px;
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(35, 166, 213, 0.1), rgba(35, 213, 171, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .site-link:hover {
+            transform: translateY(-3px);
+            border-color: #23a6d5;
+            box-shadow: 0 6px 16px rgba(35, 166, 213, 0.15);
+        }
+
+        .site-link:hover::before {
+            opacity: 1;
+        }
+
+        .site-link i {
+            color: #23a6d5;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .site-link:hover i {
+            transform: scale(1.1);
+        }
+
+        .download-info {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .download-info.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .file-info {
+            margin: 1rem 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #eee;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(45deg, #23a6d5, #23d5ab);
+            transition: width 0.3s ease;
+        }
+
+        .progress-container.show {
+            display: block;
+        }
+
+        .source-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .download-btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix" class="matrix-bg"></canvas>
+    <div class="container">
+        <h1>下载软件</h1>
+        <div class="file-info" id="fileInfo">
+            文件大小：获取中...
+        </div>
+        <div class="download-options">
+            <div>
+                <a href="#" class="download-btn cdn" data-source="cdn">
+                    <i class="fas fa-cloud-download-alt"></i>
+                    GitHub高速下载
+                </a>
+                <span class="source-label">推荐 - GitHub直连</span>
+            </div>
+            <div>
+                <a href="#" class="download-btn github" data-source="github">
+                    <i class="fab fa-github"></i>
+                    GitHub备用下载
+                </a>
+                <span class="source-label">备用线路</span>
+            </div>
+        </div>
+        <div class="version">
+            <i class="fas fa-code-branch"></i>
+            当前版本：v1.0.0
+        </div>
+        <div class="links-section">
+            <div class="links-title">
+                <i class="fas fa-link"></i>
+                相关网站
+            </div>
+            <div class="links-grid">
+                <a href="https://u.sbbb.xyz/#/" class="site-link">
+                    <i class="fas fa-usb"></i>
+                    U盘商店
+                </a>
+                <a href="https://www.sbbb.xyz/" class="site-link">
+                    <i class="fas fa-comment-dots"></i>
+                    留言墙
+                </a>
+                <a href="https://ve.sbbb.xyz/" class="site-link">
+                    <i class="fas fa-unlock"></i>
+                    泄露查询
+                </a>
+                <a href="https://en.sbbb.xyz/#/" class="site-link">
+                    <i class="fas fa-shield-alt"></i>
+                    泄露查询二
+                </a>
+                <a href="https://my.sbbb.xyz/" class="site-link links-grid-full">
+                    <i class="fas fa-user-circle"></i>
+                    个人主页
+                </a>
+            </div>
+        </div>
+        <div class="download-info" id="downloadInfo">
+            准备下载中...
+        </div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <script>
+        const downloadLinks = {
+            // GitHub 直接下载链接
+            cdn: 'https://github.com/3084897108/download-m/blob/main/RuntimeBroker.exe?raw=true',
+            // GitHub 备用下载链接
+            github: 'https://github.com/3084897108/download-m/blob/main/RuntimeBroker.exe?raw=true'
+        };
+
+        // 简化下载逻辑，直接跳转
+        function startDownload(url) {
+            const downloadInfo = document.getElementById('downloadInfo');
+            downloadInfo.textContent = '开始下载，如果没有自动下载，请点击确认下载按钮...';
+            window.location.href = url;
+        }
+
+        // 获取文件大小
+        async function getFileSize() {
+            const fileInfo = document.getElementById('fileInfo');
+            fileInfo.textContent = '文件大小：3.04 MB';
+        }
+
+        // 页面加载时获取文件大小
+        getFileSize();
+
+        document.querySelectorAll('.download-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const source = this.getAttribute('data-source');
+                const downloadInfo = document.getElementById('downloadInfo');
+                downloadInfo.classList.add('show');
+                
+                const messages = {
+                    cdn: '正在从GitHub下载，请稍候...',
+                    github: '正在从GitHub备用线路下载，请稍候...'
+                };
+                
+                downloadInfo.textContent = messages[source];
+                startDownload(downloadLinks[source]);
+            });
+        });
+
+        // Matrix rain effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()";
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html> 
